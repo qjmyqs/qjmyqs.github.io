@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>喝水监督助手 | 朋友专享版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+        
+        .main-content {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .card-title {
+            color: #3498db;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title i {
+            font-size: 1.3em;
+        }
+        
+        /* 前台打卡区域样式 */
+        .water-goal {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .goal-amount {
+            font-size: 3em;
+            font-weight: bold;
+            color: #3498db;
+            margin: 10px 0;
+        }
+        
+        .progress-container {
+            margin: 30px 0;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .progress-bar {
+            height: 25px;
+            background-color: #ecf0f1;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            width: 0%;
+            transition: width 0.8s ease;
+            border-radius: 12px;
+        }
+        
+        .drink-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .drink-btn {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .drink-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .drink-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .today-record {
+            margin-top: 20px;
+        }
+        
+        .record-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            margin-bottom: 8px;
+            border-radius: 8px;
+        }
+        
+        .record-time {
+            color: #7f8c8d;
+        }
+        
+        /* 后台监控区域样式 */
+        .admin-controls {
+            margin-bottom: 20px;
+        }
+        
+        .date-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .date-selector select, .date-selector input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        
+        .summary-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .summary-value {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .reset-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        
+        .reset-btn:hover {
+            background: #c0392b;
+        }
+        
+        .tab-switcher {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        
+        .tab-btn {
+            padding: 12px 30px;
+            background: #ecf0f1;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .motivation {
+            text-align: center;
+            font-style: italic;
+            color: #7f8c8d;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .friend-name {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .drink-buttons {
+                flex-direction: column;
+            }
+            
+            .tab-switcher {
+                flex-direction: column;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-tint"></i> 喝水监督助手</h1>
+            <p class="subtitle">专为 <span class="friend-name" id="friendName">小美</span> 设计的每日饮水打卡系统 | 后台监控模式</p>
+        </header>
+        
+        <div class="tab-switcher">
+            <button class="tab-btn active" id="frontendTab">前台打卡</button>
+            <button class="tab-btn" id="backendTab">后台监控</button>
+        </div>
+        
+        <div class="main-content">
+            <!-- 前台打卡区域 -->
+            <div class="card" id="frontendCard">
+                <h2 class="card-title"><i class="fas fa-glass-whiskey"></i> 今日喝水打卡</h2>
+                
+                <div class="water-goal">
+                    <p>今日目标：每天3次，每次500ml</p>
+                    <div class="goal-amount">1500ml</div>
+                    <p>已完成 <span id="completedAmount">0</span> ml</p>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>今日进度</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+                
+                <div class="drink-buttons">
+                    <button class="drink-btn" id="drinkBtn1">
+                        <i class="fas fa-glass-whiskey"></i> 第1次喝水 (500ml)
+                    </button>
+                    <button class="drink-btn" id="drinkBtn2">
+                        <i class="fas fa-glass-whiskey"></i> 第2次喝水 (500ml)
+                    </button>
+                    <button class="drink-btn" id="drinkBtn3">
+                        <i class="fas fa-glass-whiskey"></i> 第3次喝水 (500ml)
+                    </button>
+                </div>
+                
+                <div class="today-record">
+                    <h3><i class="fas fa-history"></i> 今日喝水记录</h3>
+                    <div id="todayRecords">
+                        <p style="text-align: center; padding: 20px; color: #7f8c8d;">今日暂无喝水记录</p>
+                    </div>
+                </div>
+                
+                <div class="motivation" id="motivationText">
+                    今天的第一杯水是健康的开始，加油！
+                </div>
+            </div>
+            
+            <!-- 后台监控区域 -->
+            <div class="card hidden" id="backendCard">
+                <h2 class="card-title"><i class="fas fa-chart-line"></i> 后台监控面板</h2>
+                
+                <div class="admin-controls">
+                    <div class="date-selector">
+                        <label for="viewDate">查看日期：</label>
+                        <input type="date" id="viewDate">
+                        <button id="todayBtn">返回今日</button>
+                    </div>
+                    
+                    <div class="date-selector">
+                        <label for="friendNameInput">监督的朋友：</label>
+                        <input type="text" id="friendNameInput" placeholder="输入朋友名字" value="小美">
+                        <button id="updateNameBtn">更新名字</button>
+                    </div>
+                </div>
+                
+                <div class="summary-box">
+                    <h3><i class="fas fa-chart-pie"></i> 今日喝水统计</h3>
+                    <div class="summary-item">
+                        <span>目标饮水量：</span>
+                        <span class="summary-value">1500 ml</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>已完成：</span>
+                        <span class="summary-value" id="adminCompleted">0 ml</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>完成进度：</span>
+                        <span class="summary-value" id="adminProgress">0%</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>打卡次数：</span>
+                        <span class="summary-value" id="adminCount">0 / 3 次</span>
+                    </div>
+                </div>
+                
+                <h3><i class="fas fa-list-alt"></i> 详细记录</h3>
+                <div class="history-list" id="historyList">
+                    <p style="text-align: center; padding: 20px; color: #7f8c8d;">暂无记录</p>
+                </div>
+                
+                <button class="reset-btn" id="resetBtn">
+                    <i class="fas fa-redo"></i> 重置今日数据
+                </button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>喝水监督助手 | 设计：关心你的朋友 | 数据存储在本地浏览器中</p>
+        </footer>
+    </div>
+
+    <script>
+        // 初始化数据
+        let drinkRecords = JSON.parse(localStorage.getItem('drinkRecords')) || [];
+        let friendName = localStorage.getItem('friendName') || '小美';
+        
+        // DOM元素
+        const friendNameElement = document.getElementById('friendName');
+        const friendNameInput = document.getElementById('friendNameInput');
+        const updateNameBtn = document.getElementById('updateNameBtn');
+        const drinkBtn1 = document.getElementById('drinkBtn1');
+        const drinkBtn2 = document.getElementById('drinkBtn2');
+        const drinkBtn3 = document.getElementById('drinkBtn3');
+        const progressFill = document.getElementById('progressFill');
+        const progressPercent = document.getElementById('progressPercent');
+        const completedAmount = document.getElementById('completedAmount');
+        const todayRecords = document.getElementById('todayRecords');
+        const motivationText = document.getElementById('motivationText');
+        const frontendTab = document.getElementById('frontendTab');
+        const backendTab = document.getElementById('backendTab');
+        const frontendCard = document.getElementById('frontendCard');
+        const backendCard = document.getElementById('backendCard');
+        const viewDate = document.getElementById('viewDate');
+        const todayBtn = document.getElementById('todayBtn');
+        const adminCompleted = document.getElementById('adminCompleted');
+        const adminProgress = document.getElementById('adminProgress');
+        const adminCount = document.getElementById('adminCount');
+        const historyList = document.getElementById('historyList');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        // 激励语句
+        const motivations = [
+            "今天的第一杯水是健康的开始，加油！",
+            "保持水分充足，皮肤会更好哦！",
+            "喝水有助于新陈代谢，继续努力！",
+            "你已经完成了一半目标，真棒！",
+            "今天喝水目标达成！为你点赞！",
+            "别忘了喝水，身体需要它！",
+            "喝水能让你保持活力满满！"
+        ];
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置朋友名字
+            friendNameElement.textContent = friendName;
+            friendNameInput.value = friendName;
+            
+            // 设置今日日期
+            const today = new Date().toISOString().split('T')[0];
+            viewDate.value = today;
+            
+            // 更新显示
+            updateFrontendDisplay();
+            updateBackendDisplay();
+            
+            // 绑定事件
+            setupEventListeners();
+        });
+        
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 打卡按钮
+            drinkBtn1.addEventListener('click', () => recordDrink(1));
+            drinkBtn2.addEventListener('click', () => recordDrink(2));
+            drinkBtn3.addEventListener('click', () => recordDrink(3));
+            
+            // 标签切换
+            frontendTab.addEventListener('click', () => switchTab('frontend'));
+            backendTab.addEventListener('click', () => switchTab('backend'));
+            
+            // 后台控制
+            updateNameBtn.addEventListener('click', updateFriendName);
+            viewDate.addEventListener('change', updateBackendDisplay);
+            todayBtn.addEventListener('click', () => {
+                const today = new Date().toISOString().split('T')[0];
+                viewDate.value = today;
+                updateBackendDisplay();
+            });
+            
+            resetBtn.addEventListener('click', resetTodayData);
+        }
+        
+        // 记录喝水
+        function recordDrink(drinkNumber) {
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            const timeString = now.toTimeString().split(' ')[0].substring(0, 5);
+            
+            // 检查今天是否已经喝过这次
+            const todayRecords = drinkRecords.filter(record => record.date === today);
+            const alreadyDrunk = todayRecords.some(record => record.drinkNumber === drinkNumber);
+            
+            if (alreadyDrunk) {
+                alert(`今天第${drinkNumber}次喝水已经记录过了！`);
+                return;
+            }
+            
+            // 创建新记录
+            const newRecord = {
+                id: Date.now(),
+                date: today,
+                drinkNumber: drinkNumber,
+                amount: 500,
+                time: timeString,
+                timestamp: now.getTime()
+            };
+            
+            // 添加到记录数组
+            drinkRecords.push(newRecord);
+            
+            // 保存到本地存储
+            localStorage.setItem('drinkRecords', JSON.stringify(drinkRecords));
+            
+            // 更新显示
+            updateFrontendDisplay();
+            updateBackendDisplay();
+            
+            // 更新激励语句
+            updateMotivation();
+            
+            // 如果三次都完成了，显示祝贺
+            const todayDrinkCount = drinkRecords.filter(r => r.date === today).length;
+            if (todayDrinkCount >= 3) {
+                setTimeout(() => {
+                    alert(`🎉 恭喜${friendName}！今天已喝完1500ml水，目标达成！`);
+                }, 300);
+            }
+        }
+        
+        // 更新前台显示
+        function updateFrontendDisplay() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayDrinks = drinkRecords.filter(record => record.date === today);
+            
+            // 计算完成情况
+            const totalAmount = todayDrinks.reduce((sum, record) => sum + record.amount, 0);
+            const progress = Math.min(100, Math.round((totalAmount / 1500) * 100));
+            
+            // 更新进度条
+            progressFill.style.width = `${progress}%`;
+            progressPercent.textContent = `${progress}%`;
+            completedAmount.textContent = totalAmount;
+            
+            // 更新按钮状态
+            drinkBtn1.disabled = todayDrinks.some(r => r.drinkNumber === 1);
+            drinkBtn2.disabled = todayDrinks.some(r => r.drinkNumber === 2);
+            drinkBtn3.disabled = todayDrinks.some(r => r.drinkNumber === 3);
+            
+            // 更新今日记录列表
+            if (todayDrinks.length > 0) {
+                todayDrinks.sort((a, b) => a.drinkNumber - b.drinkNumber);
+                
+                let recordsHTML = '';
+                todayDrinks.forEach(record => {
+                    recordsHTML += `
+                        <div class="record-item">
+                            <span>第${record.drinkNumber}次喝水</span>
+                            <span class="record-time">${record.time} | ${record.amount}ml</span>
+                        </div>
+                    `;
+                });
+                todayRecords.innerHTML = recordsHTML;
+            } else {
+                todayRecords.innerHTML = '<p style="text-align: center; padding: 20px; color: #7f8c8d;">今日暂无喝水记录</p>';
+            }
+        }
+        
+        // 更新后台显示
+        function updateBackendDisplay() {
+            const selectedDate = viewDate.value;
+            const dateDrinks = drinkRecords.filter(record => record.date === selectedDate);
+            
+            // 计算统计数据
+            const totalAmount = dateDrinks.reduce((sum, record) => sum + record.amount, 0);
+            const progress = Math.min(100, Math.round((totalAmount / 1500) * 100));
+            
+            // 更新统计信息
+            adminCompleted.textContent = `${totalAmount} ml`;
+            adminProgress.textContent = `${progress}%`;
+            adminCount.textContent = `${dateDrinks.length} / 3 次`;
+            
+            // 更新历史记录列表
+            if (dateDrinks.length > 0) {
+                dateDrinks.sort((a, b) => a.timestamp - b.timestamp);
+                
+                let historyHTML = '';
+                dateDrinks.forEach(record => {
+                    const time = new Date(record.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    historyHTML += `
+                        <div class="history-item">
+                            <span>第${record.drinkNumber}次喝水</span>
+                            <span>${time} | ${record.amount}ml</span>
+                        </div>
+                    `;
+                });
+                historyList.innerHTML = historyHTML;
+            } else {
+                historyList.innerHTML = '<p style="text-align: center; padding: 20px; color: #7f8c8d;">该日期暂无记录</p>';
+            }
+        }
+        
+        // 更新激励语句
+        function updateMotivation() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayDrinks = drinkRecords.filter(record => record.date === today);
+            const drinkCount = todayDrinks.length;
+            
+            let motivationIndex = 0;
+            if (drinkCount === 0) motivationIndex = 0;
+            else if (drinkCount === 1) motivationIndex = 1;
+            else if (drinkCount === 2) motivationIndex = 2;
+            else if (drinkCount === 3) motivationIndex = 4;
+            else motivationIndex = Math.floor(Math.random() * motivations.length);
+            
+            motivationText.textContent = motivations[motivationIndex];
+        }
+        
+        // 切换标签页
+        function switchTab(tab) {
+            if (tab === 'frontend') {
+                frontendTab.classList.add('active');
+                backendTab.classList.remove('active');
+                frontendCard.classList.remove('hidden');
+                backendCard.classList.add('hidden');
+            } else {
+                backendTab.classList.add('active');
+                frontendTab.classList.remove('active');
+                backendCard.classList.remove('hidden');
+                frontendCard.classList.add('hidden');
+            }
+        }
+        
+        // 更新朋友名字
+        function updateFriendName() {
+            const newName = friendNameInput.value.trim();
+            if (newName) {
+                friendName = newName;
+                friendNameElement.textContent = friendName;
+                localStorage.setItem('friendName', friendName);
+                alert(`朋友名字已更新为: ${friendName}`);
+            }
+        }
+        
+        // 重置今日数据
+        function resetTodayData() {
+            if (confirm('确定要重置今日的喝水记录吗？此操作不可撤销。')) {
+                const today = new Date().toISOString().split('T')[0];
+                drinkRecords = drinkRecords.filter(record => record.date !== today);
+                localStorage.setItem('drinkRecords', JSON.stringify(drinkRecords));
+                
+                updateFrontendDisplay();
+                updateBackendDisplay();
+                alert('今日喝水记录已重置！');
+            }
+        }
+        
+        // 每隔5分钟自动保存一次（虽然数据是实时保存的）
+        setInterval(() => {
+            localStorage.setItem('drinkRecords', JSON.stringify(drinkRecords));
+        }, 5 * 60 * 1000);
+    </script>
+</body>
+</html>
